@@ -25,31 +25,65 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "new_version"
+    productFlavors {
+        paid {
+            applicationId "com.udacity.gradle.builditbigger.paid"
+            dimension "new_version"
+        }
+
+        free {
+            applicationId "com.udacity.gradle.builditbigger.free"
+            dimension "new_version"
+        }
+    }
+}
+
+ext {
+    appCompat = "26.1.0"
+    googlePlayServiceAds = "15.0.1"
+    apiClientVersion = "1.23.0"
+    findBugsVersion = "3.0.1"
+    constraintLVersion = "1.1.2"
+    androidSupportAnotation = "27.1.1"
+    testRuleRunnerVersion = "1.0.2"
+    espressoVersion = "3.0.2"
+    jUnitVersion = "4.12"
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     endpointsServer project(path: ':backend', configuration: 'endpoints')
-    implementation project (":jokelib")
-    implementation project (":jokeui")
+    implementation project(":jokeui")
 
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.google.android.gms:play-services-ads:15.0.1'
-    implementation 'com.google.api-client:google-api-client:1.23.0'
-    implementation 'com.google.http-client:google-http-client-android:1.23.0'
-    implementation 'com.google.code.findbugs:jsr305:3.0.1'
+    implementation "com.android.support:appcompat-v7:$appCompat"
 
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    //Add
+    freeImplementation "com.google.android.gms:play-services-ads:$googlePlayServiceAds"
+    implementation "com.google.api-client:google-api-client:$apiClientVersion"
+    implementation "com.google.http-client:google-http-client-android:$apiClientVersion"
+    implementation "com.google.code.findbugs:jsr305:$findBugsVersion"
 
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    // Constraint Layout
+    implementation "com.android.support.constraint:constraint-layout:$constraintLVersion"
 
-    testImplementation 'junit:junit:4.12'
+    // anotation + tests dependencies
+    implementation "com.android.support:support-annotations:$androidSupportAnotation"
+    androidTestImplementation "com.android.support.test:rules:$testRuleRunnerVersion"
+    androidTestImplementation "com.android.support.test:runner:$testRuleRunnerVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
+    implementation "com.android.support.test.espresso:espresso-idling-resource:$espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espressoVersion"
+    testImplementation "junit:junit:$jUnitVersion"
 }
+
+
+

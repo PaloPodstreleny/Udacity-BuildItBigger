@@ -1,28 +1,32 @@
 package com.udacity.gradle.builditbigger;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.Toast;
+import android.util.Pair;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.udacity.gradle.builditbigger.backend.myApi.MyApi;
+import com.udacity.gradle.builditbigger.idlingResource.SimpleIdlingResource;
 
 import java.io.IOException;
 
+public class EndpointsAsyncTask extends AsyncTask<Pair<OnFinishTaskCallback,SimpleIdlingResource>, Void, String> {
 
-
-class EndpointsAsyncTask extends AsyncTask<OnFinishTaskCallback, Void, String> {
     private static MyApi myApiService = null;
     private OnFinishTaskCallback listener;
-
-
+    private SimpleIdlingResource mIdlingResource;
 
     @Override
-    protected String doInBackground(OnFinishTaskCallback... onFinishTaskCallbacks) {
-        listener = onFinishTaskCallbacks[0];
+    protected String doInBackground(Pair<OnFinishTaskCallback,SimpleIdlingResource>... onFinishTaskCallbacks) {
+        listener = onFinishTaskCallbacks[0].first;
+        mIdlingResource = onFinishTaskCallbacks[0].second;
+
+        if(mIdlingResource != null){
+            mIdlingResource.setIdlingResource(false);
+        }
+
         if(listener != null) {
             if (myApiService == null) {  // Only do this once
                 MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
@@ -52,6 +56,9 @@ class EndpointsAsyncTask extends AsyncTask<OnFinishTaskCallback, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        if(mIdlingResource != null){
+            mIdlingResource.setIdlingResource(true);
+        }
         listener.onFinished(result);
     }
 }
