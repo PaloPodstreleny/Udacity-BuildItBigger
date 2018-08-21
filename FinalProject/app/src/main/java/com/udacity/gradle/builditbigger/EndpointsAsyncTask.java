@@ -50,7 +50,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<OnFinishTaskCallback,Simp
         try {
             return myApiService.sayHi("pp").execute().getData();
         } catch (IOException e) {
-            return e.getMessage();
+            return null;
         }
     }
 

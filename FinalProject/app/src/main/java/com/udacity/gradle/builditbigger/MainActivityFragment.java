@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 
 import com.udacity.gradle.builditbigger.idlingResource.SimpleIdlingResource;
@@ -22,11 +23,12 @@ import sk.podstreleny.palo.jokeui.JokeActivity;
  */
 public class MainActivityFragment extends Fragment implements OnFinishTaskCallback {
 
-    private static final int JOKE_SIZE_MINIMUM = 2;
     private SimpleIdlingResource mIdlingResource;
     private ProgressBar mProgressBar;
     private Button mJokeButton;
     private String mJoke;
+    private TextView mErrorTextView;
+
 
     public MainActivityFragment() {
 
@@ -37,6 +39,7 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
+        mErrorTextView = root.findViewById(R.id.error_tv);
         mProgressBar = root.findViewById(R.id.progressBar);
         mJokeButton = root.findViewById(R.id.joke_btn);
         return root;
@@ -52,6 +55,7 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
             public void onClick(View view) {
                 changeVisibilityOfJokeButton(View.GONE);
                 changeVisibilityOfProgressBar(View.VISIBLE);
+                changeVisibilityOfErrorMessage(View.GONE);
                 final OnFinishTaskCallback callback = MainActivityFragment.this;
                 Pair<OnFinishTaskCallback,SimpleIdlingResource> pair = new Pair<>(callback,mIdlingResource);
                 new EndpointsAsyncTask().execute(pair);
@@ -71,13 +75,22 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
     @Override
     public void onFinished(String joke) {
         mJoke = joke;
-        changeVisibilityOfJokeButton(View.VISIBLE);
         changeVisibilityOfProgressBar(View.GONE);
-        if(getContext() !=null && joke.length() > JOKE_SIZE_MINIMUM) {
-            Intent intent = new Intent(getContext(), JokeActivity.class);
-            intent.putExtra(JokeActivity.JOKE_EXTRA, joke);
-            startActivity(intent);
+        changeVisibilityOfJokeButton(View.VISIBLE);
+        if(joke == null){
+            changeVisibilityOfErrorMessage(View.VISIBLE);
+        }else {
+            changeVisibilityOfErrorMessage(View.GONE);
+            if(getContext() !=null) {
+                Intent intent = new Intent(getContext(), JokeActivity.class);
+                intent.putExtra(JokeActivity.JOKE_EXTRA, joke);
+                startActivity(intent);
+            }
         }
+    }
+
+    private void changeVisibilityOfErrorMessage(int visibility){
+        mErrorTextView.setVisibility(visibility);
     }
 
     @VisibleForTesting

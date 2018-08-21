@@ -10,7 +10,6 @@ public class SimpleFragmentActivityTest extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-
     }
 
     public void setFragment(Fragment fragment){

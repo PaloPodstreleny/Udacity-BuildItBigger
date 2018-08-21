@@ -12,10 +12,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.isInternal;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.core.IsNot.not;
 
 @RunWith(AndroidJUnit4.class)
@@ -46,7 +49,12 @@ public class MainActivityTest {
 
         //Check if asyncTask returns string > 0
         final String joke = mFragment.getJoke();
+        if(joke == null) {
+            onView(withId(R.id.error_tv)).check(matches(isDisplayed()));
+            fail("Joke is null!");
+        }
         assertTrue(joke.length() > 0);
+
     }
 
 

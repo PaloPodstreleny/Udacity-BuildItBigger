@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -33,6 +34,7 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
     private Button mJokeButton;
     private InterstitialAd mInterstitialAdd;
     private String mJoke;
+    private TextView mErrorTextView;
 
 
     @Override
@@ -40,6 +42,7 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
+        mErrorTextView = root.findViewById(R.id.error_tv);
         mProgressBar = root.findViewById(R.id.progressBar);
         mJokeButton = root.findViewById(R.id.joke_btn);
 
@@ -64,6 +67,7 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
             public void onClick(View view) {
                 changeVisibilityOfProgressBar(View.VISIBLE);
                 changeVisibilityOfJokeButton(View.GONE);
+                changeVisibilityOfErrorMessage(View.GONE);
                 final OnFinishTaskCallback callback = MainActivityFragment.this;
                 Pair<OnFinishTaskCallback,SimpleIdlingResource> pair = new Pair<>(callback,mIdlingResource);
                 new EndpointsAsyncTask().execute(pair);
@@ -71,7 +75,8 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
         });
 
         mInterstitialAdd = new InterstitialAd(getContext());
-        mInterstitialAdd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+
+        mInterstitialAdd.setAdUnitId(getString(R.string.banner_ad_unit_id_2));
         AdRequest request = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
         mInterstitialAdd.loadAd(request);
 
@@ -99,11 +104,17 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
         mJoke = joke;
         changeVisibilityOfProgressBar(View.GONE);
         changeVisibilityOfJokeButton(View.VISIBLE);
-        if(mInterstitialAdd.isLoaded()){
-            mInterstitialAdd.show();
+        if(joke == null){
+            changeVisibilityOfErrorMessage(View.VISIBLE);
         }else {
-            moveToAnotherActivity(joke);
+            changeVisibilityOfJokeButton(View.GONE);
+            if(mInterstitialAdd.isLoaded()){
+                mInterstitialAdd.show();
+            }else {
+                moveToAnotherActivity(joke);
+            }
         }
+
     }
 
     private void moveToAnotherActivity(String joke){
@@ -113,6 +124,10 @@ public class MainActivityFragment extends Fragment implements OnFinishTaskCallba
             intent.putExtra(JokeActivity.JOKE_EXTRA, joke);
             startActivity(intent);
         }
+    }
+
+    private void changeVisibilityOfErrorMessage(int visibility){
+        mErrorTextView.setVisibility(visibility);
     }
 
 }
